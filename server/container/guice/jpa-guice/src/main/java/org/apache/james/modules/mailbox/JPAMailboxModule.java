@@ -19,7 +19,9 @@
 package org.apache.james.modules.mailbox;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.inject.Singleton;
 import javax.persistence.EntityManagerFactory;
@@ -62,6 +64,7 @@ import org.apache.james.modules.Names;
 import org.apache.james.utils.MailboxManagerDefinition;
 import org.apache.james.utils.PropertiesProvider;
 
+import com.google.common.base.Joiner;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
@@ -135,8 +138,17 @@ public class JPAMailboxModule extends AbstractModule {
         properties.put("openjpa.ConnectionDriverName", jpaConfiguration.getDriverName());
         properties.put("openjpa.ConnectionURL", jpaConfiguration.getDriverURL());
 
-        return Persistence.createEntityManagerFactory("Global", properties);
+        List<String> connectionFactoryProperties = new ArrayList<>();
+        connectionFactoryProperties.add("TestOnBorrow=" + jpaConfiguration.isTestOnBorrow());
+        if (jpaConfiguration.getValidationQueryTimeoutSec() > 0) {
+            connectionFactoryProperties.add("ValidationTimeout=" + jpaConfiguration.getValidationQueryTimeoutSec() * 1000);
+        }
+        if (jpaConfiguration.getValidationQuery() != null) {
+            connectionFactoryProperties.add("ValidationSQL='" + jpaConfiguration.getValidationQuery() + "'");
+        }
+        properties.put("openjpa.ConnectionFactoryProperties", Joiner.on(", ").join(connectionFactoryProperties));
 
+        return Persistence.createEntityManagerFactory("Global", properties);
     }
 
     @Provides
@@ -146,6 +158,9 @@ public class JPAMailboxModule extends AbstractModule {
         return JPAConfiguration.builder()
                 .driverName(dataSource.getString("database.driverClassName"))
                 .driverURL(dataSource.getString("database.url"))
+                .testOnBorrow(dataSource.getBoolean("datasource.testOnBorrow", false))
+                .validationQueryTimeoutSec(dataSource.getInt("datasource.validationQueryTimeoutSec", -1))
+                .validationQuery(dataSource.getString("datasource.validationQuery", null))
                 .build();
     }
 }
