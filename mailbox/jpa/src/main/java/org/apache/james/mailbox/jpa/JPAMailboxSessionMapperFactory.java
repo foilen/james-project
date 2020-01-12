@@ -53,7 +53,13 @@ public class JPAMailboxSessionMapperFactory extends MailboxSessionMapperFactory 
         this.entityManagerFactory = entityManagerFactory;
         this.uidProvider = uidProvider;
         this.modSeqProvider = modSeqProvider;
-        createEntityManager().close();   
+        EntityManager em = createEntityManager();
+        if (em.isOpen()) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            em.close();
+        }
     }
     
     @Override

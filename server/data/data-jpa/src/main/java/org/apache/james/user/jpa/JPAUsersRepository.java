@@ -66,7 +66,13 @@ public class JPAUsersRepository extends AbstractUsersRepository {
 
     @PostConstruct
     public void init() {
-        createEntityManager().close();
+        EntityManager em = createEntityManager();
+        if (em.isOpen()) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            em.close();
+        }
     }
 
     /**
@@ -91,7 +97,12 @@ public class JPAUsersRepository extends AbstractUsersRepository {
             LOGGER.debug("Failed to find user", e);
             throw new UsersRepositoryException("Unable to search user", e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 
@@ -139,7 +150,12 @@ public class JPAUsersRepository extends AbstractUsersRepository {
             }
             throw new UsersRepositoryException("Failed to update user " + user.getUserName(), e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 
@@ -170,7 +186,12 @@ public class JPAUsersRepository extends AbstractUsersRepository {
             }
             throw new UsersRepositoryException("Failed to remove user " + name, e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 
@@ -194,7 +215,12 @@ public class JPAUsersRepository extends AbstractUsersRepository {
             LOGGER.debug("Failed to find user", e);
             throw new UsersRepositoryException("Failed to find user" + name, e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 
@@ -235,7 +261,12 @@ public class JPAUsersRepository extends AbstractUsersRepository {
             LOGGER.debug("Failed to find user", e);
             throw new UsersRepositoryException("Failed to count users", e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 
@@ -258,7 +289,12 @@ public class JPAUsersRepository extends AbstractUsersRepository {
             LOGGER.debug("Failed to find user", e);
             throw new UsersRepositoryException("Failed to list users", e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 
@@ -297,7 +333,12 @@ public class JPAUsersRepository extends AbstractUsersRepository {
             }
             throw new UsersRepositoryException("Failed to add user" + username, e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 

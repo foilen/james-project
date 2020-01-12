@@ -89,6 +89,9 @@ public abstract class JPATransactionalMapper extends TransactionalMapper {
     public void endRequest() {
         if (entityManager != null) {
             if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
                 entityManager.close();
             }
             entityManager = null;

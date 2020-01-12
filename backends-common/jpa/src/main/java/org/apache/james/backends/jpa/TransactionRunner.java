@@ -72,7 +72,12 @@ public class TransactionRunner {
             }
             return errorHandler.apply(e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 
@@ -91,7 +96,12 @@ public class TransactionRunner {
             }
             errorHandler.apply(e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 }

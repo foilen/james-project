@@ -73,7 +73,13 @@ public class JPADomainList extends AbstractDomainList {
 
     @PostConstruct
     public void init() {
-        createEntityManager().close();
+        EntityManager em = createEntityManager();
+        if (em.isOpen()) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            em.close();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -97,7 +103,12 @@ public class JPADomainList extends AbstractDomainList {
             rollback(transaction);
             throw new DomainListException("Unable to retrieve domains", e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
         return ImmutableList.copyOf(domains);
     }
@@ -116,7 +127,12 @@ public class JPADomainList extends AbstractDomainList {
             rollback(transaction);
             throw new DomainListException("Unable to retrieve domains", e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 
@@ -138,7 +154,12 @@ public class JPADomainList extends AbstractDomainList {
             rollback(transaction);
             throw new DomainListException("Unable to add domain " + domain.name(), e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 
@@ -159,7 +180,12 @@ public class JPADomainList extends AbstractDomainList {
             rollback(transaction);
             throw new DomainListException("Unable to remove domain " + domain.name(), e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 

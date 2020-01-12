@@ -60,7 +60,12 @@ public class JPAModSeqProvider extends AbstractLockingModSeqProvider {
             throw new MailboxException("Unable to get highest mod-sequence for mailbox " + mailbox, e);
         } finally {
             if (manager != null) {
-                manager.close();
+                if (manager.isOpen()) {
+                    if (manager.getTransaction().isActive()) {
+                        manager.getTransaction().rollback();
+                    }
+                    manager.close();
+                }
             }
         }
     }
@@ -84,7 +89,12 @@ public class JPAModSeqProvider extends AbstractLockingModSeqProvider {
             throw new MailboxException("Unable to save highest mod-sequence for mailbox " + mailbox, e);
         } finally {
             if (manager != null) {
-                manager.close();
+                if (manager.isOpen()) {
+                    if (manager.getTransaction().isActive()) {
+                        manager.getTransaction().rollback();
+                    }
+                    manager.close();
+                }
             }
         }
     }

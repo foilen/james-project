@@ -108,7 +108,12 @@ public class JPARecipientRewriteTable extends AbstractRecipientRewriteTable {
             }
             throw new RecipientRewriteTableException("Error while retrieve mappings", e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 
@@ -133,7 +138,12 @@ public class JPARecipientRewriteTable extends AbstractRecipientRewriteTable {
             }
             throw new RecipientRewriteTableException("Error while retrieve mappings", e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 
@@ -175,7 +185,12 @@ public class JPARecipientRewriteTable extends AbstractRecipientRewriteTable {
             }
             throw new RecipientRewriteTableException("Unable to update mapping", e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
         return false;
     }
@@ -203,7 +218,12 @@ public class JPARecipientRewriteTable extends AbstractRecipientRewriteTable {
             throw new RecipientRewriteTableException("Unable to remove mapping", e);
 
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 
@@ -225,7 +245,12 @@ public class JPARecipientRewriteTable extends AbstractRecipientRewriteTable {
             }
             throw new RecipientRewriteTableException("Unable to add mapping", e);
         } finally {
-            entityManager.close();
+            if (entityManager.isOpen()) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+            }
         }
     }
 

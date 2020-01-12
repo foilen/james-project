@@ -64,7 +64,12 @@ public class JPAUidProvider extends AbstractLockingUidProvider {
             throw new MailboxException("Unable to get last uid for mailbox " + mailbox, e);
         } finally {
             if (manager != null) {
-                manager.close();
+                if (manager.isOpen()) {
+                    if (manager.getTransaction().isActive()) {
+                        manager.getTransaction().rollback();
+                    }
+                    manager.close();
+                }
             }
         }
     }
@@ -88,7 +93,12 @@ public class JPAUidProvider extends AbstractLockingUidProvider {
             throw new MailboxException("Unable to save next uid for mailbox " + mailbox, e);
         } finally {
             if (manager != null) {
-                manager.close();
+                if (manager.isOpen()) {
+                    if (manager.getTransaction().isActive()) {
+                        manager.getTransaction().rollback();
+                    }
+                    manager.close();
+                }
             }
         }
     }
